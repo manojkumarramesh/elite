@@ -1,0 +1,1900 @@
+Subversion USER Control Panel
+
+https://svn.bvirateam.com:4434/csvn
+
+SVN CHECKOUT LINK and Files Commit, Update Link
+
+https://svn.bvirateam.com:18080/svn/qaserver/trunk/Bvira_xcart
+
+SVN Files VIEW LINK
+
+https://svn.bvirateam.com:18080/viewvc/qaserver/
+
+Username: manoj
+password: elitehour
+
+QA Admin Password - sIrXzmV5xs
+------------------------------
+1. Common Database
+
+DataBase: xcart1
+username: bvira
+Password: L0C@LDB%1234/UseR
+
+2. Live Server Database
+
+https://192.168.1.253:7543
+
+Database: livedb
+username: livedbuser
+password: L0C@LDB%1234/UseR
+------------------------------
+Configuration Settings
+
+config.php
+smarty.php
+init.php
+------------------------------
+{capture name=minicart_js}
+    {literal}
+        $(document).ready(function(){
+            $('.mc_full').removeClass('mc_full').addClass('mc_empty');
+        });
+    {/literal}
+{/capture}
+
+{load_defer file="minicart_js" direct_info=$smarty.capture.minicart_js type="js"}
+----------------
+{capture name=ajax_minicart}
+    var lbl_error               = '{$lng.lbl_error|wm_remove|escape:javascript}';
+    var txt_minicart_total_note = '{$lng.txt_minicart_total_note|wm_remove|escape:javascript}';
+{/capture}
+
+{load_defer file="ajax_minicart" direct_info=$smarty.capture.ajax_minicart type="js"}
+{load_defer file="js/ajax.minicart.js" type="js"}
+------------------------------
+UPDATE xcart_pricing JOIN xcart_products ON (xcart_pricing.productid = xcart_products.productid) SET xcart_pricing.price = xcart_products.list_price;
+-------
+SELECT child.categoryid, child.category FROM xcart_categories AS parent, xcart_categories AS child WHERE child.parentid = parent.categoryid AND parent.categoryid = 8
+-------
+SELECT parent.categoryid FROM xcart_categories AS node, xcart_categories AS parent WHERE node.lpos BETWEEN parent.lpos AND parent.rpos AND node.categoryid = 8 ORDER BY parent.lpos
+
+SELECT parent.categoryid FROM xcart_categories AS node, xcart_categories AS parent WHERE node.lpos BETWEEN parent.lpos AND parent.rpos AND node.categoryid = 1 ORDER BY parent.rpos
+
+SELECT t1.categoryid FROM xcart_categories AS t1 LEFT JOIN xcart_categories as t2 ON t1.categoryid = t2.parentid WHERE t2.categoryid IS NULL;
+
+SELECT node.categoryid FROM xcart_categories AS node JOIN xcart_categories AS parent ON node.lpos between parent.lpos AND parent.rpos AND parent.categoryid = 1 ORDER BY node.categoryid
+------------------------------
+PAYPAL
+
+vijayk_1331810845_biz@elitehour.com
+Vendor
+two
+------------------------------
+Feb-13-2012
+
+/cart.php
+/home.php
+/products.php
+/recommends.php
+/search.php
+/modules/Bestsellers/bestsellers.php
+/modules/Upselling_Products/related_products.php
+/skin/common_files/common_templates.tpl
+/skin/common_files/single/menu_box.tpl
+/include/common.php
+/skin/common_files/js/ajax.minicart.js
+/admin/process_category.php
+/include/func/func.category.php
+------------------------------
+Feb-14-2012
+
+1) Customer login -> Account details - Hide the Bonus tab
+admin -> settings -> modules -> Special Offers (diasbled)
+
+2) Registration page ->  if email already exists, replace the error message with "You already have an account with Bvira.com. You can login using your email and password."
+admin -> content -> languages -> search (txt_user_already_exists)
+
+3) Layout -> need to analyze how to implement
+Homepage - header and footer (fixed)
+Inner pages - header and footer (floating)
+bvira/skin/ability/custom/common.tpl
+bvira/skin/ability/custom/custom_bvira_styles.tpl
+
+4) Registration page -> hide the membership box, also make sure all changes in registration page will reflect on the registration section in checkout page
+admin -> settings -> General -> Enable sign-up for membership (diasbled)
+
+5) Registration page -> hide tax number field
+admin -> users -> user search -> see also -> user profiles
+
+6) Registration page -> hide newsletter area
+admin -> settings -> modules -> News Management (diasbled)
+
+7) Cart / checkout page -> hide redeem discount coupon area
+admin -> settings -> modules -> Discount Coupons (diasbled)
+
+8) Cart / checkout page -> hide partner id field
+admin -> settings -> modules -> Affiliate -> Configure -> General Affiliate options -> Ask for partner ID on checkout (diasbled)
+
+9) Cart / checkout page -> hide gift coupon and add gift wrap area
+admin -> settings -> modules -> Gift Certificates (diasbled)
+admin -> settings -> General Settings -> Gift wrapping (diasbled)
+
+10) Cart / checkout page -> estimate shipping cost - make zip code mandatory
+/init.php -> $shipping_estimate_fields - zipcode - required - Y
+
+12) Homepage ->  hide manufaturer boxes
+admin -> settings -> modules -> Manufacturers -> Configure -> Show manufacturers list in the menu column (diasbled)
+admin -> settings -> modules -> Ability Template -> Configure -> Display manufacturers (diasbled)        /skin/ability/customer/special.tpl
+    orginal -> {if $active_modules.Manufacturers ne "" and $config.Manufacturers.manufacturers_menu ne "Y"}
+    changed -> {if $active_modules.Manufacturers ne "" and $config.Manufacturers.manufacturers_menu eq "Y"}
+------------------------------
+Feb-28-2012
+
+Product pages
+
+UPDATE `xcart_config` SET `variants` = 'tabs_above:Custom Tabs Above tabs_below:Custom Tabs Below accordion:Vertical Accordion Below standard:Standard X-Cart Tabs Below custom_style1:Custom Style 1 disabled:Disabled'WHERE `xcart_config`.`name` = 'abi_product_info_display';
+
+/skin/ability/customer/main/product_details.tpl
+/include/func/func.product.php
+/skin/ability/customer/main/product.tpl
+/skin/ability/customer/main/products_switchers.tpl
+/skin/ability/custom/addons/custom_style1.tpl
+/skin/ability/modules/Recommended_Products/recommends.tpl
+/products.php
+/recommends.php
+------------------------------
+Feb-29-2012
+
+Recently sold Module
+
+INSERT INTO `xcart_modules` (`moduleid`, `module_name`, `module_descr`, `active`) VALUES (NULL, 'Recently_Sold', 'This module allows you to display recently sold products to customers. ', 'Y');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'module_name_Recently_Sold', 'Recently Sold', 'Modules');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'rsold_section', 'Recently Sold', 'Labels');
+INSERT INTO `xcart_config` (`name`, `comment`, `value`, `category`, `orderby`, `type`, `defvalue`, `variants`, `validation`) VALUES ('rsold_products_count', 'Number of products to show to customers in Home Page', '2', 'Recently_Sold', '0', 'numeric', '2', '', 'uintz');
+
+/product.php
+/skin/ability/customer/right_bar.tpl
+/skin/ability/modules/Recently_sold(folder)
+/skin/ability/modules/Recently_sold/content.tpl
+/modules/Recently_sold(folder)
+/modules/Recently_sold/config.php
+/modules/Recently_sold/func.php
+/postauth.php(not needed)
+/skin/ability/custom/addons/custom_recently_sold.tpl
+/skin/ability/custom/addons/custom_recently_viewed.tpl
+/skin/ability/custom/addons/custom_navigation_recently_sold.tpl
+/skin/ability/custom/addons/custom_navigation_recently_viewed.tpl
+------------------------------
+Mar-01-2012
+
+Template - Home Page
+
+/skin/ability/customer/content.tpl
+/skin/ability/custom/addons/custom_company_main.tpl
+/skin/ability/custom/addons/custom_home_main.tpl
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_see_more', 'See more', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_why_bvira', 'Why Bvira?', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_how_to_buy', 'How to Buy?', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_how_to_sell', 'How to Sell?', 'Labels');
+
+Category home page needs to be unique for each category - create static pages
+
+/skin/ability/customer/main/subcategories.tpl
+/skin/ability/customer/main/welcome.tpl
+/skin/ability/customer/main/welcome_products.tpl
+/skin/ability/customer/main/welcome_motors.tpl
+/skin/ability/customer/main/welcome_services.tpl
+/skin/ability/customer/main/subcategories_products.tpl
+------------------------------
+Mar-03-2012
+
+User profile
+
+/skin/common_files/customer/main/register.tpl
+/skin/common_files/customer/main/register_personal_info.tpl
+/skin/ability/custom/addons/ajaxupload(folder)
+/include/check_useraccount.php
+/skin/ability/customer/right_dashboard.tpl
+------------------------------
+Mar-15-2012
+
+Footer
+
+/skin/ability/customer/home.tpl
+/skin/ability/customer/customer_footer.tpl
+/skin/ability/custom/footer/footer_style_3.tpl
+/skin/ability/custom/footer/content/footer_tweets.tpl
+/skin/ability/custom/footer/content/footer_facebook.tpl
+/skin/ability/custom/footer/content/footer_menu_custom.tpl
+/skin/ability/custom/footer/content/footer_menu_speedbar.tpl
+/skin/ability/custom/footer/content/footer_about.tpl
+/skin/ability/custom/footer/content/footer_follow_us.tpl
+/skin/ability/custom/footer/footer_copyright.tpl
+/skin/ability/customer/left_bar.tpl
+------------------------------
+Mar-23-2012
+
+/skin/ability/provider/main/promotions.tpl
+/skin/ability/provider/custom_bvira_styles.tpl
+------------------------------
+Mar-27-2012
+
+Text -> txt_customer_faq
+Text -> txt_vendor_faq
+Text -> txt_general_faq
+/skin/ability/custom/addons/faqs(folder)
+------------------------------
+Mar-28-2012
+
+Single product page design and implementation based on the wireframe
+
+/skin/ability/customer/main/product_details.tpl
+/skin/ability/custom/addons/custom_style1.tpl
+/skin/ability/customer/main/product_above.tpl
+/skin/ability/customer/main/vendor_details.tpl
+/skin/ability/customer/left_right_bar_2_cols.tpl
+/modules/Magnifier/product_magnifier.php
+/skin/common_files/modules/Magnifier/product_magnifier.tpl
+
+/product.php
+/skin/common_files/modules/Detailed_Product_Images/widget.tpl
+/skin/common_files/modules/Detailed_Product_Images/popup_image.tpl
+
+/include/ajax_image_manipulations.php
+/include/image_selection.php
+/skin/common_files/main/popup_image_selection.tpl
+upload_max_filesize = 4M
+errors => err_upload_format_not_allowed => The uploaded File Format is not allowed.
+errors => err_upload_min_allowed_width => Minimum allowed width 300 px.
+errors => err_upload_min_allowed_height => Minimum allowed height 300 px.
+/include/func/func.image.php
+/skin/common_files/main/image_area.tpl
+
+ALTER TABLE `xcart_setup_images` CHANGE `itype` `itype` CHAR( 3 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
+INSERT INTO `xcart_setup_images` (`itype` ,`location` ,`save_url` ,`size_limit` ,`md5_check` ,`default_image`) VALUES ('MID', 'FS', '', '0', '', './default_image.gif');
+INSERT INTO `xcart_setup_images` (`itype` ,`location` ,`save_url` ,`size_limit` ,`md5_check` ,`default_image`) VALUES ('PL', 'FS', '', '0', '', './default_image.gif');
+
+errors => err_upload_category_min_allowed_width => Minimum allowed width 150 px.
+errors => err_upload_category_min_allowed_height => Minimum allowed height 150 px.
+------------------------------
+Apr-10-2012
+
+Product images display
+
+/include/image_selection.php
+/modules/Recently_Sold/func.php
+/skin/ability/custom/addons/custom_home_main.tpl
+/skin/ability/custom/addons/custom_recently_sold.tpl
+/skin/ability/custom/addons/custom_recently_viewed.tpl
+/skin/ability/custom/addons/custom_style1.tpl
+/skin/ability/custom/addons/menus/horiz/mega/mega.tpl
+/skin/ability/custom/css/common.css
+/skin/ability/customer/left_right_bar_2_cols.tpl
+/skin/ability/customer/main/product_above.tpl
+/skin/ability/customer/main/products_switchers.tpl
+/skin/ability/customer/main/subcategories_products.tpl
+/skin/ability/customer/main/subcategories_t.tpl
+/skin/ability/modules/Recommended_Products/recommends.tpl
+/skin/ability/modules/Recently_Viewed/content.tpl
+/skin/ability/modules/Recently_Sold/content.tpl
+/skin/ability/modules/Bestsellers/menu_bestsellers.tpl
+/init.php
+/products.php
+/product.php
+/recommends.php
+
+Google Analytics Code
+
+/skin/ability/customer/home.tpl
+------------------------------
+Apr-19-2012
+
+Vendor Contact Form
+
+/vendor_contact_form.php
+
+/skin/ability/custom/addons/custom_company_main.tpl
+
+/skin/ability/customer/main/vendor_details.tpl
+/skin/ability/customer/main/vendor_contact_form.tpl
+
+/skin/ability/custom/js/custom.js
+
+/skin/ability/custom/custom_bvira_styles.tpl
+
+/skin/common_files/mail/vendor_contact.tpl
+/skin/common_files/mail/vendor_contactus_subj.tpl
+------------------------------
+Apr-23-2012
+
+Seller Profile
+
+table -> bvira_sale_module
+
+table -> bvira_product_upload_options
+
+/documents  (folder)
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_seller_profile', 'Seller Profile', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_sale_module', 'Sale Module', 'Labels');
+
+/init.php
+/seller_profile.php
+/downloader.php
+
+/provider/seller_profile.php
+
+/admin/seller_profile.php
+
+/include/register.php
+/include/account_tabs.php
+/include/seller_profile.php
+/include/check_useraccount.php
+
+/skin/ability/customer/right_dashboard.tpl
+
+/skin/ability/custom/common.tpl
+/skin/ability/custom/custom_styles.tpl
+/skin/ability/custom/js/custom.js
+/skin/ability/custom/addons/custom_company_main.tpl
+
+/skin/common_files/dialog_tools_cell.tpl
+/skin/common_files/customer/home_main.tpl
+/skin/common_files/customer/main/register.tpl
+/skin/common_files/customer/main/register_personal_info.tpl
+/skin/common_files/customer/main/top_links.tpl
+/skin/common_files/customer/main/seller_profile.tpl
+/skin/common_files/customer/main/seller_add_profile.tpl
+/skin/common_files/customer/main/business_seller_profile.tpl
+/skin/common_files/customer/main/individual_seller_profile.tpl
+
+/skin/ability/provider/menu_box.tpl
+/skin/ability/provider/home.tpl
+/skin/ability/provider/custom_bvira_styles.tpl
+
+/skin/common_files/provider/main/register.tpl
+/skin/common_files/provider/main/profile_menu.tpl
+/skin/common_files/provider/main/seller_profile.tpl
+/skin/common_files/provider/main/seller_edit_profile.tpl
+/skin/common_files/provider/main/business_seller_profile.tpl
+/skin/common_files/provider/main/individual_seller_profile.tpl
+
+/skin/common_files/admin/home.tpl
+/skin/common_files/admin/main/register.tpl
+------------------------------
+May-16-2012
+
+Single Product Upload
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_bvira_product_code', 'Bvira Product Code', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_vendor_product_code', 'Vendor Product Code', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_condition', 'Condition', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_product_title_name', 'Product / Service / Title Name', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_sale_price', 'Sale Price', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_lowest_possible_price', 'Lowest Possible Price', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_vendor_cost', 'Seller Cost', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'err_upload_max_image_size', 'Image size exceeds 10 MB', 'Errors');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'txt_product_max_file_size_warning', '<font class="Star">WARNING!</font> The maximum file size that can be uploaded: 10MB.', 'Text');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_sale_price_help', 'Enter your sale price, if you sell the product at a discounted price. Otherwise, leave it as 0 and the system will use the market price as your sale price.', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_vendor_cost_help', 'Seller cost is the cost that you incur for obtaining the product. You can enter this cost for your reference and this will be kept confidential.', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_map_price', 'MAP Price', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_upc_ean_gtin_product_id', 'UPC / EAN / GTIN / Product ID', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_mpn_model_number', 'MPN / Model Number', 'Labels');
+
+ALTER TABLE `xcart_products` ADD `fixedprice` DECIMAL( 12, 2 ) NULL DEFAULT '0.00' AFTER `weight`;
+ALTER TABLE `xcart_products` ADD `upc_ean_gtin_product_id` INT(11) NULL;
+ALTER TABLE `xcart_products` ADD `mpn_model_number` INT(11) NULL;
+ALTER TABLE `xcart_products` ADD `brand_manufacturer_name` VARCHAR(32) NULL;
+ALTER TABLE `xcart_products` ADD `vendorproductcode` VARCHAR( 32 ) NOT NULL;
+ALTER TABLE `xcart_products` ADD `condition` INT( 1 ) NOT NULL DEFAULT '1';
+ALTER TABLE `xcart_products` ADD `ifused` INT( 1 ) NULL;
+ALTER TABLE `xcart_products` ADD `saleid` INT( 11 ) NOT NULL DEFAULT '0';
+ALTER TABLE `xcart_products` ADD `lowest_possible_price` DECIMAL( 12, 2 ) NOT NULL DEFAULT '0.00' AFTER `list_price`;
+ALTER TABLE `xcart_products` ADD `vendor_cost` DECIMAL( 12, 2 ) NULL DEFAULT '0.00' AFTER `lowest_possible_price`;
+ALTER TABLE `xcart_products` ADD `taxcountry` CHAR( 2 ) NULL;
+ALTER TABLE `xcart_products` ADD `taxstate` CHAR( 2 ) NULL;
+ALTER TABLE `xcart_products` ADD `taxpercent` INT( 5 ) NULL;
+ALTER TABLE `xcart_products` ADD `currency` VARCHAR( 5 ) NULL;
+ALTER TABLE `xcart_products` ADD `shipping_id` INT( 2 ) NULL;
+ALTER TABLE `xcart_products` ADD `quantity_type` INT( 1 ) NULL AFTER `fulldescr`;
+ALTER TABLE `xcart_products` ADD `vendor_list_price` DECIMAL( 12, 2 ) NOT NULL DEFAULT  '0.00' AFTER  `list_price`;
+ALTER TABLE `xcart_products` ADD `vendor_lowest_possible_price` DECIMAL( 12, 2 ) NOT NULL DEFAULT  '0.00' AFTER  `lowest_possible_price`;
+ALTER TABLE `xcart_products` ADD `vendor_vendor_cost` DECIMAL( 12, 2 ) NOT NULL DEFAULT  '0.00' AFTER  `vendor_cost`;
+
+ALTER TABLE `xcart_pricing` ADD  `vendor_price` DECIMAL( 12, 2 ) NOT NULL DEFAULT  '0.00' AFTER  `price`;
+
+CREATE TABLE IF NOT EXISTS `bvira_seller_shipping_fixedprice` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`productid` int(11) NOT NULL,
+`provider` int(11) NOT NULL,
+`country_code` char(3) NOT NULL,
+`fixedprice` decimal(12,2) NOT NULL DEFAULT '0.00',
+`vendor_fixedprice` decimal(12,2) NOT NULL DEFAULT '0.00',
+PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+/init.php
+/ajax_call.php
+/product.php
+
+/admin/imagemulti.php
+
+/include/product_modify.php
+/include/image_selection.php
+
+/include/classes/class.product.php
+
+/skin/ability/custom/common.tpl
+/skin/ability/custom/js/custom.js
+
+/skin/ability/customer/main/products_switchers.tpl
+/skin/ability/customer/menu_provider.tpl
+/skin/ability/customer/main/product_above.tpl
+/skin/ability/customer/main/product_details.tpl
+/skin/ability/customer/main/vendor_details.tpl
+
+/skin/ability/provider/custom_bvira_styles.tpl
+/skin/ability/provider/main/promotions.tpl
+
+/skin/common_files/images/btn_readmore.png
+
+/skin/common_files/main/popup_image_selection.tpl
+/skin/common_files/main/image_area.tpl
+/skin/common_files/main/product_modify.tpl
+/skin/common_files/main/product_details.tpl
+/skin/common_files/main/product_details_js.tpl
+/skin/common_files/main/category_selector.tpl
+/skin/common_files/main/select_category.tpl
+/skin/common_files/main/clean_url_field.tpl
+
+/skin/common_files/lib/jqueryui/jquery.ui.admin.css
+
+var requiredFields = [
+['product', "{$lng.lbl_product_title_name|strip_tags|wm_remove|escape:javascript}", false],
+['productcode', "{$lng.lbl_bvira_product_code|strip_tags|wm_remove|escape:javascript}", false],
+['vendorproductcode', "{$lng.lbl_vendor_product_code|strip_tags|wm_remove|escape:javascript}", false],
+['vendorsku', "{$lng.lbl_vendor_sku|strip_tags|wm_remove|escape:javascript}", false],
+{if $config.SEO.clean_urls_enabled eq "Y"} ['clean_url', "{$lng.lbl_clean_url|strip_tags|wm_remove|escape:javascript}", false], {/if}
+['descr', "{$lng.lbl_description|strip_tags|wm_remove|escape:javascript}", false],
+['list_price', "{$lng.lbl_list_price|strip_tags|wm_remove|escape:javascript}", false],
+['lowest_possible_price', "{$lng.lbl_lowest_possible_price|strip_tags|wm_remove|escape:javascript}", false]
+];
+------------------------------
+Jun-09-2012
+
+Seller enquiry form customization
+
+No Need address
+
+Upto postal code remove
+
+No need fax
+
+No need subject
+Keep default subject "Seller enquiry form from <Firstname>"
+keep Subject but not mandatory
+
+Phone format
+Phone number is not mandatory
+Phone -> no mandatory
+
+webiste format just enter www.... no need http://
+Websit no mandatory
+
+we have to keep Country
+Country mandatory
+
+First Name Mandatory
+
+last name no mandatory
+
+company no mandaotry
+
+email mandatory
+
+message no mandatory
+
+/init.php
+
+$default_contact_us_fields = array(
+'department'    => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'username'      => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'title'         => array(
+    'avail'     => 'N',
+    'required'  => 'N'
+),
+'firstname'     => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'lastname'      => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'company'       => array(
+    'avail'     => 'Y',
+    'required'  => 'N'
+),
+'b_address'     => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'b_address_2'   => array(
+    'avail'     => 'Y',
+    'required'  => 'N'
+),
+'b_city'        => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'b_county'      => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'b_state'       => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'b_country'     => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'b_zipcode'     => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'phone'         => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'email'         => array(
+    'avail'     => 'Y',
+    'required'  => 'Y'
+),
+'fax'           => array(
+    'avail'     => 'Y',
+    'required'  => 'N'
+),
+'url'           => array(
+    'avail'     => 'Y',
+    'required'  => 'N'
+)
+);
+
+/skin/ability/customer/seller_enquiry.tpl
+
+/skin/common_files/mail/seller_enquiry.tpl
+
+/sellerenquiry.php
+-----------------------------------------------
+Jun-18
+
+X-Mall issue fixes
+
+add to .htaccess file
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_bcse_xmall_config_skin_theme', 'Theme', 'Labels');
+
+/skin/ability/customer/main/vendor_details.tpl
+/skin/ability/customer/main/welcome.tpl
+
+/skin/ability/custom/addons/custom_home_main.tpl
+
+/skin/common_files/modules/BCSE_Xmall/bcse_xmall_manager.js
+
+/skin/common_files/modules/BCSE_Xmall/bcse_xmall_manager_store_info.tpl
+
+/init.php
+/home.php
+/product.php
+/products.php
+/recommends.php
+/dispatcher.php
+/ajax_call.php
+
+/admin/bcse_xmall_manager.php
+
+/include/search.php
+/include/common.php
+
+/include/classes/class.product.php
+
+/include/func/func.category.php
+
+/modules/BCSE_Xmall/config.php
+/modules/BCSE_Xmall/init.php
+/modules/BCSE_Xmall/func.php
+
+/modules/Recently_Sold/config.php
+/modules/Recently_Sold/func.php
+
+/modules/Recently_Viewed/func.php
+
+/modules/Bestsellers/bestsellers.php
+
+/modules/Products_Map/func.php
+-----------------------------------------------
+June-25
+
+Product Info page Click for larger image link
+
+/skin/ability/customer/main/product_above.tpl
+-----------------------------------------------
+July-11
+
+removed manufacturer logo
+
+/skin/ability/customer/main/product_details.tpl
+-----------------------------------------------
+July-14
+
+Change categories display
+-----------------------------------------------
+July-12
+
+Taxonomy for product extra fields
+
+table -> xcart_extra_fields
+
+Add field -> categoryid, type(textbox,dropdown,dropdown_level_1)
+
+ALTER TABLE `xcart_extra_fields`  ADD `categoryid` INT(11) NULL AFTER `fieldid`;
+
+ALTER TABLE  `xcart_extra_fields` ADD  `type` TEXT NULL AFTER  `field`;
+
+ALTER TABLE `xcart_extra_fields` CHANGE `value` `value` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '';
+
+/ajax_call.php
+
+/include/product_modify.php
+
+/skin/common_files/main/product_details.tpl
+
+/skin/common_files/main/extra_fields.tpl
+
+/skin/ability/custom/js/custom.js
+
+Make
+-----
+Acura;Aston Martin;Audi;Bentley;BMW;Bugatti;Buick;Cadillac;Chevrolet;Chrysler;Dodge;Ferrari;FIAT;Ford;GMC;Honda;Hyundai;Infiniti;Jaguar;Jeep;Kia;Lamborghini;Land Rover;Lexus;Lincoln;Lotus;Maserati;Maybach;Mazda;McLaren;Mercedes-Benz;Mercury;MINI;Mitsubishi;Nissan;Porsche;Rolls-Royce;Saab;Scion;smart;Spyker;Subaru;Suzuki;Tesla;Toyota;Volkswagen;Volvo;Daewoo;
+
+Model
+-----
+acura:CL,RL,Integra,RSX,Legend,TL,MDX,TSX,RDX,ZDX;
+bentley:Arnage,Continental,Azure;
+bwm:1 Series,M6,3 Series,X3,5 Series,X5,6 Series,X6,7 Series,Z3,M,Z4,M3,Z4,M5,Z;
+buick:Century,Rainier,Enclave,Regal,LaCrosse,Rendezvous,LeSabre,Riviera,Lucerne,Roadmaster,Park Avenue;
+cadillac:Allante,Escalade ESV,CTS,Escalade EXT,DTS,SRX,DeVille,STS,Eldorado,Seville,Escalade,XLR;
+infiniti:EX,M,FX,Q,G,QX,I;
+jaguar:S-type,XJ Series,X-Type,XK Series,XF;
+jeep:Cherokee,Liberty,Commander,Patriot,Compass,Wrangler,Grand Cherokee;
+kia:Amanti,Rondo,Borrego,Sedona,Forte,Sorento,Optima,Soul,Optima (2006.5),Spectra,Rio,Sportage;
+porsche:911,Cayenne,928,Cayman,Boxster,Panamera,Carrera GT;
+rolls-royce:Phantom,Ghost;
+saab:9-2X,9-5,9-3;
+scion:tC,xB,xA,xD;
+subaru:B9-Tribeca,Legacy,Forester,Outback,Impreza,Tribeca;
+suzuki:Equator crew cab,Verona,Forenza,Vitara,Grand Vitara,XL-7,Reno,XL7,SX4;
+volkswagen:CC,Passat,Cabrio,Phaeton,Eos,R32,Eurovan,Rabbit,GLI,Routan,GTI,Tiguan,Golf,Touareg,Jetta,Touareg 2,Jetta (New),Vanagon,New Beetle;
+volvo:240,S80,850,V40,960,V50,C30,V70,C70,XC60,S40,XC70,S60,XC90,S70;
+-----------------------------------------------
+July-17
+
+Orders Search
+
+/include/func/func.order.php (after line 1692)  //not now
+ALTER TABLE `xcart_orders` ADD `bvira_orderid` INT( 11 ) NULL AFTER `orderid`;
+if($status == 'P') {
+    //db_query("UPDATE $sql_tbl[orders] SET bvira_orderid = '1' WHERE orderid = '$orderid'");
+}
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_upc_ean_gtin_product_id', 'UPC / EAN / GTIN / Product ID', 'Labels');
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_mpn_model_number', 'MPN / Model Number', 'Labels');
+
+/skin/ability/custom/addons/custom_recently_sold.tpl
+
+/skin/common_files/main/extra_fields.tpl
+/skin/common_files/main/product_details.tpl
+
+/skin/ability/custom/js/custom.js
+
+/ajax_call.php
+/product.php
+
+/include/classes/class.product.php
+
+/include/orders.php
+/include/product_modify.php
+
+/modules/Extra_Fields/extra_fields.php
+-----------------------------------------------
+July-23
+
+Tweaks on the preferred currency, language and country fields on customer profile - COMPLETED
+
+The following tweaks need to be done for preferred currency, country and language fields.
+
+1. When all fields including these fields are submitted and if the page is reloaded on some error like captcha code not entered correctly. these 3 fields are not getting populated. Make sure these 3 fields also get populated in forementioned scenario.
+
+2. Enable these three fields on customer's update profile section and admin's user profile section and populate their values from database. Make sure that any changes done to these fields are also get applied when the profile is updated.
+
+/skin/common_files/customer/main/register_personal_info.tpl
+/skin/common_files/main/register_personal_info.tpl
+
+/admin/user_modify.php
+--------------
+Split the textbox for the mobile number into two textboxes on the seller registration. - COMPLETED
+
+Split the mobile number textbox into 2 boxes. one small textbox for country code and another box for mobile number. Store both values in the same field by joining using hypen. For example, 91-9876543210. Apply this to update profile section and admin as well.
+
+/skin/common_files/customer/main/business_seller_profile.tpl
+/skin/common_files/customer/main/individual_seller_profile.tpl
+
+/skin/common_files/provider/main/business_seller_profile.tpl
+/skin/common_files/provider/main/individual_seller_profile.tpl
+
+/include/seller_profile.php
+
+/skin/ability/custom/js/custom.js
+--------------
+Add checkbox "Same as business address" for shipping source address on seller's
+update profile section - COMPLETED
+
+Add a checkbox "Same as business address" for the shipping source address. this would be available only for the business seller. This doesn't need to be stored on the database. The only purpose of this checkbox is to copy the business address to shipping source address, if it is checked.
+
+When this checkbox is checked and the profile is updated, it is not necessary to keep it checked after reloading the page.
+
+/skin/common_files/customer/main/business_seller_profile.tpl
+/skin/ability/custom/js/custom.js
+-----------------------------------------------
+July-25
+
+Image upload functionality changes
+
+UPDATE `xcart_languages` SET `value` = 'Minimum allowed width 100 px.' WHERE `code` = 'en' AND `name` = 'err_upload_min_allowed_width';
+UPDATE `xcart_languages` SET `value` = 'Minimum allowed height 100 px.' WHERE `code` = 'en' AND `name` = 'err_upload_min_allowed_height';
+
+/init.php
+
+/include/image_selection.php
+
+/skin/common_files/main/image_area.tpl
+
+/admin/imagemulti.php
+-----------------------------------------------
+July-31
+
+Review on single product upload
+
+1. Show the actual region name instead of the region code for the fixed shipping price.
+2. Hide the links in the right side bar for sellers only.
+3. Show UPC and MPN fields only for the Product type.
+4. Change the 'Product name' label based on the root category type.
+5. Hide default 0.00 on focus for the price text fields.
+
+/ajax_call.php
+
+/include/product_modify.php
+
+/include/classes/class.product.php
+
+/skin/ability/custom/js/custom.js
+/skin/ability/customer/main/vendor_details.tpl
+
+/skin/common_files/dialog_tools.tpl
+/skin/common_files/main/product_details.tpl
+-----------------------------------------------
+August-1
+
+Bargain UI implementation
+
+UPDATE `xcart_languages` SET `value` = 'Your price' WHERE `xcart_languages`.`code` = 'en' AND `xcart_languages`.`name` = 'lbl_bargain';
+
+/skin/ability/customer/main/products_switchers.tpl
+
+/skin/common_files/customer/main/buy_now.tpl
+
+/skin/common_files/customer/bargain.tpl
+
+/skin/common_files/customer/main/bargain_session_list.tpl
+
+/skin/ability/custom/js/custom.js
+
+/ajax_call.php
+
+/home.php
+
+/product.php
+
+/products.php
+
+/modules/Extra_Fields/extra_fields.php
+
+/include/search.php
+
+/include/classes/class.product.php
+-----------------------------------------------
+August-10
+
+1. Highlight the current tab
+2. Add the condition for the lowest possible price to the bargain now query
+3. Show the tabs only if there were more than one sale module.
+
+if(empty($active_modules['BCSE_Xmall']) === false && 
+                empty($xmall_store_info) === false) {
+
+    Product::func_check_providers_product($productid);
+}
+-----------------------------------------------
+August-17
+
+BCSE_Xmall fixes
+
+/skin/ability/customer/main/vendor_details.tpl
+/skin/ability/custom/addons/custom_recently_sold.tpl
+
+/admin/bcse_xmall_manager.php
+
+/modules/BCSE_Xmall/func.php
+
+/modules/Recently_Sold/config.php
+/modules/Recently_Sold/func.php
+-----------------------------------------------
+August-21
+
+Dynamic payment gateway selection as per vendor's registration setting on the checkout page
+
+/cart.php
+/include/checkout.php
+/modules/One_Page_Checkout/checkout.php
+
+/include/func/func.cart.php
+-----------------------------------------------
+August-22
+
+Add Friends Module
+
+elitetest12@gmail.com
+
+Intel123
+
+/skin/ability/custom/js/js_addfriends.js
+
+/include/add_friends.php
+
+/include/register.php
+
+/skin/common_files/mail/signin_notification.tpl
+
+/skin/common_files/mail/profile_data.tpl
+-----------------------------------------------
+August-25
+
+Restrict products from different vendors from adding to the shopping cart
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'msg_err_multi_vendor_products', 'Sorry, currently we do not support adding products from different sellers to the shopping cart at the same time. Please checkout or clear the current cart items to add products from a different vendor to the shopping cart.', 'Errors');
+
+/cart.php
+
+/include/func/func.cart.php
+-----------------------------------------------
+September-03
+
+SEO-On-Page-Recommendation-v1.0
+
+function.get_title.php(no changes)
+
+/include/func/func.category.php
+
+/include/func/func.product.php
+-----------------------------------------------
+September-04
+
+Other Products
+
+/recommends.php
+
+txt_recommends_comment
+-----------------------------------------------
+September-05
+
+xmall given link to store for vendor name
+
+/skin/ability/customer/main/vendor_details.tpl
+
+/skin/ability/customer/main/products_switchers.tpl
+
+/include/search.php
+-----------------------------------------------
+September-06
+
+YQL
+
+YAPI KEY: 8VWnqk5a
+
+/cronscript/cron_keywords_generator.php
+
+/cronscript/keywords_generator.txt
+
+/include/classes/class.product.php
+
+/include/func/func.product.php
+-----------------------------------------------
+September-14
+
+Special Deals & New Arrivals Issue
+
+SELECT MAX(  `productid` ) ,  `categoryid` 
+FROM  `xcart_products_categories` 
+WHERE  `categoryid` IN ( 8, 13, 98, 184, 190, 197, 268, 286, 305 ) 
+GROUP BY  `xcart_products_categories`.`categoryid` 
+
+Special Deals
+
+INSERT INTO `xcart_config` (`name`, `comment`, `value`, `category`, `orderby`, `type`, `defvalue`, `variants`, `validation`) VALUES ('special_deals_categories_list', 'List products from Categories', '1', 'Special_Deals', '0', 'text', '2', '', '');
+
+/modules/Special_Deals/config.php
+/modules/Special_Deals/func.php
+
+/skin/ability/custom/addons/custom_special_deals.tpl
+-------------------------
+New Arrivals
+
+INSERT INTO `xcart_config` (`name`, `comment`, `value`, `category`, `orderby`, `type`, `defvalue`, `variants`, `validation`) VALUES ('new_arrivals_categories_list', 'List products from Categories', '1', 'New_Arrivals', '0', 'text', '2', '', '');
+
+/modules/New_Arrivals/config.php
+/modules/New_Arrivals/func.php
+
+/skin/ability/custom/addons/custom_new_arrivals.tpl
+-----------------------------------------------
+September-20
+
+/modules/Special_Deals/func.php
+
+/skin/ability/custom/addons/custom_special_deals.tpl
+
+/skin/ability/custom/css/special_newarrivals.css
+-----------------------------------------------
+September-21
+
+YQL
+
+/keywords_generator.php
+/keywords_generator_log.txt
+
+/cronscript/cron_keywords_generator.php
+/cronscript/keywords_generator.txt
+/include/classes/class.product.php
+/cronscript/keywords_generator_log.txt
+-----------------------------------------------
+September-27
+
+Vendor Store
+
+/store.php
+/ajax_call.php
+/include/search.php
+/include/classes/class.product.php
+/modules/BCSE_Xmall/init.php
+
+/skin/ability/custom/js/custom.js
+/skin/ability/customer/left_bar.tpl
+/skin/ability/customer/right_bar.tpl
+/skin/ability/customer/left_right_bar_2_cols.tpl
+/skin/ability/customer/main/vendor_details.tpl
+/skin/ability/customer/main/products_switchers.tpl
+
+/skin/common_files/customer/home_main.tpl
+/skin/common_files/customer/vendor_store_bar.tpl
+/skin/common_files/customer/vendor_store_categories.tpl
+/skin/common_files/customer/main/vendor_store.tpl
+
+link changes - {$xcart_web_dir}
+
+Header
+
+/skin/ability/custom/header/content/header_top_links.tpl
+/skin/ability/custom/header/content/header_minicart.tpl
+
+horizontal bar
+
+/skin/ability/custom/addons/menus/horiz/mega/mega.tpl
+
+Footer
+
+/skin/ability/custom/footer/content/footer_menu_custom.tpl
+/skin/ability/custom/footer/content/footer_about.tpl
+/skin/ability/custom/footer/content/footer_special_links.tpl
+
+commented xmall code
+
+/init.php
+/recommends.php
+/include/search.php
+/include/func/func.category.php
+/modules/Recently_Sold/config.php
+/modules/Recently_Viewed/func.php
+/modules/Bestsellers/bestsellers.php
+/modules/Products_Map/func.php
+-----------------------------------------------
+September-28
+
+Task : Remove country, currency and language on the registration page. Make name as optional.
+
+/skin/common_files/customer/main/register_personal_info.tpl
+-----------------------------------------------
+October-01
+
+Task : Set the Business Name for vendor on all product listing, single product page.
+
+/init.php
+/include/func/func.core.php
+
+/modules/Recently_Sold/func.php
+/skin/ability/custom/addons/custom_recently_sold.tpl
+/skin/ability/custom/addons/custom_recently_viewed.tpl
+
+/skin/ability/customer/main/product_above.tpl
+/skin/ability/customer/main/products_switchers.tpl
+
+/include/func/func.product.php
+/skin/ability/modules/Recommended_Products/recommends.tpl
+-----------------------------------------------
+October-04
+
+Task : Add following 2 checkboxes on the login form. Always Signed in and Stay signed in for next 7 days
+
+Task : stay signed in for
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_always_signed_in', 'Always Signed In', 'Labels');
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_stay_signed_in', 'Stay signed in for next 7 days', 'Labels');
+
+/skin/common_files/customer/main/login_form.tpl
+
+/include/login.php
+/include/sessions.php
+
+/skin/ability/custom/js/custom.js
+-----------------------------------------------
+October-09
+
+Task : Change the shipping method on the checkout page based on seller's shipping method choice
+
+/include/cart_calculate_totals.php
+/include/classes/class.product.php
+-----------------------------------------------
+October-17
+
+Vendor Store - again
+
+table -> bvira_seller_categories
+/cronscript/cron_seller_category_generator.php
+
+/skin/common_files/customer/main/vendor_store.tpl
+/skin/common_files/customer/vendor_store_categories.tpl
+/skin/common_files/customer/vendor_store_bar.tpl
+/skin/ability/customer/main/vendor_details.tpl
+/skin/ability/customer/main/products_switchers.tpl
+
+/store.php
+/init.php
+
+/modules/BCSE_Xmall/init.php
+/modules/BCSE_Xmall/func.php
+
+/include/classes/class.product.php
+-----------------------------------------------
+October-19
+
+Task : Add details and buttons similar to Listing page on Related Products
+
+Task : Add details and buttons similar to Listing page on Recently sold
+
+Task : Add details and buttons similar to Listing page on Recently Viewed
+
+/custom_prod_details_rv.php
+/product.php
+
+/include/func/func.product.php
+
+/modules/Recently_sold/config.php
+/modules/Recently_sold/func.php
+
+/skin/ability/custom/js/custom.js
+/skin/ability/custom/addons/custom_style1.tpl
+/skin/ability/customer/main/product_details.tpl
+/skin/ability/customer/main/products_switchers.tpl
+-----------------------------------------------
+October-25
+
+Task : Show the extra fields based on all category level chosen on the single product upload page
+
+ALTER TABLE  `xcart_extra_fields` ADD  `is_variant` CHAR( 1 ) NOT NULL DEFAULT  'N';
+
+/ajax_call.php
+
+/include/product_modify.php
+
+/modules/Extra_Fields/extra_fields.php
+
+/skin/ability/custom/js/custom.js
+
+/skin/ability/custom/addons/custom_style1.tpl
+
+/skin/common_files/main/extra_fields.tpl
+/skin/common_files/main/product_details.tpl
+-----------------------------------------------
+October-30
+
+Task : Change the update seller profile to store the payment related information to be stored in encrypted format to bvira_seller_payment_methods table
+
+/skin/common_files/provider/main/seller_edit_profile.tpl
+
+/provider/seller_profile.php
+
+/include/seller_profile.php
+
+/skin/ability/custom/js/custom.js
+-----------------------------------------------
+November-01
+
+Task : Option to edit category for multiple products
+
+/ajax_call.php
+
+/skin/common_files/main/search_result.tpl
+
+/skin/ability/custom/js/custom.js
+
+/skin/ability/custom/provider_common.tpl
+-----------------------------------------------
+November-02
+
+ALTER TABLE `xcart_extra_fields` ADD `is_filter` CHAR( 1 ) NOT NULL DEFAULT 'N' AFTER `is_variant`;
+
+Task : filter by sale price
+
+Task : filter by brand
+
+Task : filter by sellers
+
+Task : filter by extra fields
+
+/skin/ability/custom/common.tpl
+
+/skin/ability/custom/js/filter.js
+
+/skin/ability/customer/left_bar.tpl
+
+/skin/ability/customer/filter_by.tpl
+
+/home.php
+
+/ajax_call.php
+
+/include/search.php
+
+/include/classes/class.filter.php
+
+/include/classes/class.product.php
+-----------------------------------------------
+November-05
+
+Task : Membership
+
+/skin/common_files/customer/main/seller_add_profile.tpl
+
+/skin/common_files/provider/main/seller_edit_profile.tpl
+
+/seller_profile.php
+
+/admin/seller_profile.php
+
+/provider/seller_profile.php
+-----------------------------------------------
+November-06
+
+Task : Multiple product listing - Show category, description, wholesale price,list price, sale price, lowest possible price, wholesaler, extra fields
+
+Task : Option to choose multiple products and set them live, paid listing and featured products
+
+/skin/ability/customer/menu_provider.tpl
+
+/skin/common_files/main/products.tpl
+
+/skin/ability/provider/menu_box.tpl
+
+/skin/ability/provider/home.tpl
+
+/include/search.php
+
+/include/process_product.php
+
+/init.php
+-----------------------------------------------
+November-08
+
+Task : In the update seller profile, provide a button "Apply Changes" to update data without checking for required fields
+
+/skin/ability/custom/provider_common.tpl
+
+/skin/common_files/provider/main/seller_edit_profile.tpl
+
+/provider/seller_profile.php
+
+/admin/seller_profile.php
+
+/skin/ability/custom/js/custom.js
+-----------------------------------------------
+November-12
+
+Task : quantity_type
+
+/skin/common_files/modules/Product_Options/func.js
+
+/skin/ability/custom/js/custom.js
+-----------------------------------------------
+November-14
+
+Task : Search by Wholesaler
+
+/skin/common_files/main/search_result.tpl
+
+/include/search.php
+-----------------------------------------------
+November-15
+
+Task : Hide the quantity range in bracket near quantity text box for the products that have quantity always in stock.
+
+/skin/ability/customer/main/product_details.tpl
+
+Task : fetch Related products based on extra fields
+
+Task : fetch Related products based on variants
+
+/recommends.php
+-----------------------------------------------
+November-16
+
+Task : wholesale price show as xx.xx
+
+/skin/common_files/main/products.tpl
+
+November-16
+
+Task : Provide a grid view for multiple product listing on seller area
+
+/skin/ability/buttons/button.tpl
+
+/skin/ability/provider/home.tpl
+
+/skin/ability/provider/menu_box.tpl
+
+/skin/common_files/provider/main/search_grid.tpl
+
+/provider/search_grid.php
+
+/include/search_grid.php
+-----------------------------------------------
+November-24
+
+Task : Mapping extra fields to multiple categories
+
+CREATE TABLE IF NOT EXISTS `bvira_extra_field_mapping` (
+  `categoryid` int(11) NOT NULL,
+  `fieldid` int(11) NOT NULL,
+  KEY `categoryid` (`categoryid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+/skin/common_files/admin/home.tpl
+
+/skin/common_files/modules/Extra_Fields/extra_fields.tpl
+
+/skin/common_files/modules/Extra_Fields/extra_field_map.tpl
+
+/skin/ability/custom/js/extra_field_map.js
+
+/init.php
+
+/admin/extra_field_map.php
+-----------------------------------------------
+December-03
+
+/all_store_menu.php - not needed
+
+Vendor Store Vertical flyout menu
+
+ALTER TABLE  `bcse_xmall_stores` ADD  `vertical_menu_list` BLOB NULL AFTER  `directory`;
+
+/admin/bcse_xmall_manager.php
+
+/modules/BCSE_Xmall/update_store_categories.php
+
+/store.php
+
+/include/classes/class.product.php
+
+/cronscript/cron_store_category_generator.php
+
+/cronscript/cron_store_category_generator_two.php
+
+/skin/ability/customer/left_right_bar_2_cols.tpl
+
+/skin/common_files/customer/main/vendor_store.tpl
+
+/skin/common_files/customer/vendor_store_categories.tpl
+-----------------------------------------------
+December-07
+
+Task : Mapping Extra fields to Category interface
+
+/skin/common_files/modules/Extra_Fields/extra_field_map.tpl
+
+/skin/ability/custom/js/extra_field_map.js
+
+/admin/extra_field_map.php
+-----------------------------------------------
+December-11
+
+Task : filter by
+
+/skin/ability/custom/js/filter.js
+
+/skin/ability/customer/filter_by.tpl
+
+/include/classes/class.filter.php
+
+/include/classes/class.product.php
+-----------------------------------------------
+December-12
+
+Task : add new extra field
+
+ALTER TABLE `xcart_extra_fields` DROP `is_variant`;
+
+ALTER TABLE `xcart_extra_fields` DROP `filter_by`;
+
+/ajax_call.php
+
+/admin/extra_fields.php
+
+/skin/common_files/modules/Extra_Fields/extra_fields.tpl
+-----------------------------------------------
+December-12
+
+Task : Single Product Upload add / edit variant
+
+/ajax_call.php
+
+/include/product_modify.php
+/include/search.php
+
+/include/classes/class.product.php
+
+/skin/ability/custom/js/custom.js
+
+/skin/ability/custom/provider_common.tpl
+
+/skin/common_files/main/extra_fields.tpl
+/skin/common_files/main/product_details.tpl
+
+/skin/ability/buttons/button.tpl
+
+/modules/Extra_Fields/extra_fields.php
+--------------------
+xcart_class_options
+xcart_variants
+xcart_variant_items
+xcart_pricing
+
+/modules/Product_Options/product_options.php
+
+/modules/Product_Options/product_variants.php
+-----------------------------------------------
+December-13
+
+Task : Add a textbox for Wholesale price on the single product upload interface
+
+Task : Provide option to navigate between next and previous products on the single product upload interface
+
+/skin/common_files/main/product_details.tpl
+
+/include/product_modify.php
+
+/include/search.php
+-----------------------------------------------
+December-15
+
+Task : Products - Grid view added set live search
+
+/skin/common_files/provider/main/search_grid.tpl
+
+/provider/search_grid.php
+
+/include/search_grid.php
+-----------------------------------------------
+December-17
+
+Task : sigle product upload removed validation for clean url check
+
+/skin/common_files/main/product_details.tpl
+-------------------
+Task : Vendor Contact Form
+
+/skin/ability/customer/main/vendor_details.tpl
+
+/skin/ability/custom/js/custom.js
+
+/ajax_call.php
+
+/vendor_contact_form.php - delete
+
+/skin/ability/customer/main/vendor_contact_form.tpl - delete
+-------------------
+Task : Hide wholesale cost and seller cost on the single product upload for subseller accounts
+
+/skin/ability/custom/js/custom.js
+
+/ajax_call.php
+
+/include/classes/class.product.php
+
+/skin/common_files/main/product_details.tpl
+-----------------------------------------------
+December-18
+
+Task :  Add 5th level subcategory dropdown for the single product upload interface
+
+Task :  Append '-productid' to the clean url when adding a new product
+
+/ajax_call.php
+
+/include/classes/class.product.php
+
+/skin/ability/custom/js/custom.js
+
+/skin/common_files/main/select_category.tpl
+-----------------------
+Task : Filter by changes
+
+/home.php
+
+/ajax_call.php
+
+/include/search.php
+
+/skin/ability/custom/js/filter.js
+
+/include/classes/class.filter.php
+
+/skin/ability/customer/filter_by.tpl
+-----------------------------------------------
+December-20
+
+Task: Disable SQL cache for showing product info on the single product upload interface
+
+/include/product_modify.php
+
+/include/func/func.product.php
+-----------------------
+Task : Change the shipping method on the checkout page based on seller's shipping method choice - Hide
+
+/include/cart_calculate_totals.php
+-----------------------------------------------
+December-24
+
+Task : filter by
+
+/home.php
+
+/init.php
+
+/products.php
+
+/ajax_call.php
+
+/include/search.php
+
+/include/func/func.product.php
+
+/include/classes/class.filter.php
+
+/include/classes/class.product.php
+
+/skin/ability/custom/js/filter.js
+
+/skin/ability/customer/filter_by.tpl
+
+/skin/ability/customer/left_bar.tpl
+-----------------------------------------------
+December-26
+
+Task : Products - Grid view added Option to create retail packs
+
+Task : Show the retail packs under each product on the products grid view of the seller area
+
+ALTER TABLE `xcart_products` ADD `product_packs` VARCHAR( 250 ) NULL DEFAULT NULL AFTER `featured`;
+
+ALTER TABLE `bvira_product_packs` ADD INDEX ( `productid` );
+
+/skin/common_files/provider/main/search_grid.tpl
+
+/provider/search_grid.php
+
+/include/search_grid.php
+
+/include/retail_packs.php
+-----------------------------
+Task : Show the retail packs on the single product page
+
+/skin/ability/customer/main/product_details.tpl
+-----------------------------------------------
+December-28
+
+Task : Order related changes
+
+1. Order Status to be changed: New, In Process, Shipped, Cancelled
+2. The order page should display only the new orders and should have provision to filter by order status and date range
+
+status (existing)
+------
+I - Not finished
+Q - Queued
+A - Pre-Authorized
+P - Processed
+B - Backordered
+D - Declined
+F - Failed
+C - Complete
+
+New status named changed
+------
+P - Processed   => New
+B - Backordered => In Process
+C - Complete    => Shipped
+D - Declined    => Cancelled
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_status_new', 'New', 'Labels');
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_status_in_process', 'In Process', 'Labels');
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_status_shipped', 'Shipped', 'Labels');
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_status_cancelled', 'Cancelled', 'Labels');
+
+/skin/common_files/main/orders.tpl
+
+/skin/common_files/main/order_status.tpl
+
+/skin/common_files/admin/menu_box.tpl
+
+/skin/ability/provider/menu_box.tpl
+
+/skin/ability/customer/menu_provider.tpl
+
+/include/orders.php
+-----------------------------------------------
+December-31
+
+Task : fetch Categories product count
+
+/home.php
+
+/include/func/func.core.php
+-----------------------------------------------
+Task : Rich snippets - Breadcrumbs
+
+/skin/ability/custom/addons/breadcrumbs/breadcrumbs.tpl
+-----------------------------------------------
+2013
+-----------------------------------------------
+January-02-2013
+
+Task : tracking details
+
+3. On changing the order status to Shipped, Need to get input for tracking details.
+
+ALTER TABLE `xcart_orders` ADD `tracking_details` TEXT NULL DEFAULT NULL AFTER `tracking`;
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_tracking_details', 'Tracking Details', 'Labels');
+
+/skin/common_files/main/orders_list.tpl
+
+/skin/common_files/main/order_status.tpl
+
+/include/process_order.php
+
+/skin/common_files/main/history_order.tpl
+
+/admin/order.php
+
+4. On the front end, provide an interface for the customer to get the tracking details based on the order number
+
+/skin/ability/customer/right_dashboard.tpl
+
+/skin/common_files/customer/home_main.tpl
+
+/skin/ability/customer/main/track_order.tpl
+
+/skin/ability/custom/header/header_style_2.tpl
+
+/skin/ability/custom/header/content/header_top_links.tpl
+
+/track_order.php
+-----------------------------------------------
+January-07
+
+Task : tracking details - changes
+
+/skin/common_files/main/history_order.tpl
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_track_order_search_error', 'No record found', 'Labels');
+
+/track_order.php
+
+/skin/ability/customer/main/track_order.tpl
+
+/skin/common_files/main/orders.tpl
+-----------------------------------------------
+January-09
+
+Task : set free shipping and flat price
+
+5. Free shipping should only be applied on orders of minimum order amount $49. If the order amount is below $49, the fixed cost will be applicable. If there is no fixed cost, set a flat price of $6.99
+
+$0-$30  => 5.99
+
+$31-$60 => 7.99
+
+$61-$99 => 9.99
+
+> $99   => 0.00 (free shipping)
+
+/skin/ability/provider/menu_box.tpl
+-----------------------------------------------
+January-16
+
+Task : Bvira Warehouse
+
+INSERT INTO `xcart_languages` (`code`, `name`, `value`, `topic`) VALUES ('en', 'lbl_bvira_warehouse', 'Bvira Warehouse', 'Labels');
+
+/skin/ability/provider/menu_box.tpl
+/skin/ability/provider/home.tpl
+
+/skin/common_files/provider/main/bvira_warehouse.tpl
+
+/init.php
+
+/provider/warehouse.php
+
+DROP TABLE IF EXISTS `bvira_warehouse`;
+CREATE TABLE IF NOT EXISTS `bvira_warehouse` (
+  `productid` int(11) NOT NULL,
+  `variantid` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  KEY `productid` (`productid`),
+  KEY `variants` (`productid`,`variantid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+-----------------------------------------------
+January-28
+
+Bvira Price Range Markup
+
+/skin/ability/provider/home.tpl
+
+/skin/common_files/provider/main/bvira_warehouse.tpl
+/skin/common_files/provider/main/bvira_price_range_markup.tpl
+
+/provider/bvira_price_range_markup.php
+-----------------------------------------------
+January-29
+
+cron Variants generator
+
+/cronscript/cron_variants_generator.php
+-----------------------------------------------
+January-30
+
+bvira warehouse filters - search by product code, vendor sku, wholesaler
+
+/provider/warehouse.php
+
+/skin/common_files/provider/main/bvira_warehouse.tpl
+-----------------------------------------------
+January-31
+
+Bvira Price Range Markup
+
+/skin/common_files/provider/main/bvira_warehouse.tpl
+
+/skin/common_files/provider/main/bvira_price_range_markup.tpl
+
+/provider/bvira_price_range_markup.php
+
+/init.php
+-----------------------------------------------
+February-01
+
+Task : Discount Plans for registered users
+
+1. create coupon for 5%, 10%, 15%
+2. Provide configuration to set number of points equivalent to 1 USD
+3. On successful order placement, add points to registered users
+4. Apply discount coupon for registered users only based on their accumulated points as follows,
+
+0-5000          - 5%
+5001-10000      - 10%
+10000 and above - 15%
+
+INSERT INTO `xcart_config` (`name`, `comment`, `value`, `category`, `orderby`, `type`, `defvalue`, `variants`, `validation`) VALUES ('point_equal_to_one_usd', 'Number of points equivalent to 1 USD', '1', 'Discount_Coupons', '11', 'numeric', '1', '', 'uintz');
+
+ALTER TABLE `xcart_customers` ADD `user_points` INT( 11 ) NULL AFTER `sub_user_privileges`;
+
+/init.php
+
+/cart.php
+
+/include/func/func.order.php
+
+/include/func/func.cart.php
+-----------------------------------------------
+February-11
+
+/init.php
+
+/include/func/func.order.php
+
+/include/func/func.core.php
+-----------------------------------------------
+February-12
+
+/skin/ability/customer/home.tpl
+
+/skin/ability/custom/welcome/welcome_new_products.tpl
+-----------------------------------------------
+February-14
+
+home page get mail id pop issue
+
+/popup_takein_mail.php
+
+/skin/common_files/customer/help/popup_takein_mail.tpl
+----------------------------
+For the products that has custom retail packs, the fixed shipping cost need to be calculated per pack instead of per unit.
+
+For example if a product has custom packs as 4, 8, 12, 16 and its fixed shipping cost is $10,
+
+Currently,following are the shipping cost calculated for the packs
+
+4 -> $40
+8 -> $80
+12 -> $120
+16 -> $160
+
+This need to be changed as follows
+
+4 -> $10
+8 -> $20
+12 -> $30
+16 -> $40
+-----------------------------------------------
+February-15
+
+Task : On the live site, single product page shows the extra fields 2 times. Check the following url, where polyster material is being shown 2 times.
+
+/skin/ability/custom/addons/custom_style1.tpl
+
+/modules/Extra_Fields/extra_fields.php
+----------------------------
+Task : On recently viewed page, the product block need to be changed to same as multiple product page.
+
+/recently_viewed.php
+
+/skin/ability/customer/main/recently_viewed.tpl
+-----------------------------------------------
+March-01
+
+Task : Bvira Footer
+
+/skin/bvira/customer/home.tpl
+/skin/bvira/customer/footer.tpl
+/skin/bvira/custom/footer/footer_copyright.tpl
+-----------------------------------------------
+March-05
+
+Task : Implementation of Recently Viewed and Best sellers on the home page bottom section.
+
+/skin/bvira/css/altskin.css
+
+/skin/bvira/customer/home.tpl
+
+/skin/bvira/customer/service_js.tpl
+
+/skin/bvira/custom/js/jquery.carouFredSel.js
+
+/skin/bvira/modules/Recently_Viewed/custom_home_recently_viewed.tpl
+
+/custom_home_rv.php
+
+/modules/Bestsellers/bestsellers.php
+-----------------------------------------------
+March-07
+
+Task : bazicproducts.com
+
+/bazic (folder and all files)
+-----------------------------------------------
+March-11
+
+Task : Minicart
+
+/skin/bvira/customer/home.tpl
+
+/skin/bvira/custom/header/header.tpl
+---------------------------
+Task : Multiple products listing page
+
+/skin/bvira/css/altskin.css
+
+/skin/bvira/customer/main/subcategories.tpl
+
+/skin/bvira/customer/main/subcategories_t.tpl
+
+/skin/bvira/customer/main/products.tpl
+
+/skin/bvira/customer/main/products_switchers.tpl
+-----------------------------------------------
+March-15
+
+Task : bazicproducts.com - changes
+
+/bazic/bazic_product_upload.php
+---------------------------
+Task : lashowroom.com
+
+info@elitehour.com / zzxcv1234
+
+/las/cron_one_fetch_store_url.php
+
+/las/cron_two_fetch_category_url.php
+
+/las/cron_three_fetch_single_url.php
+
+/las/cron_four_single_product.php
+
+/las/core.class.php
+
+ALTER TABLE `las_products_url` ADD `is_error` INT( 1 ) NOT NULL DEFAULT '0' AFTER `is_done` ,
+ADD `error_fields` TEXT NOT NULL AFTER `is_error`;
+
+ALTER TABLE `bvira_product_packs` CHANGE `size_count` `size_count` INT( 10 ) NULL DEFAULT '0';
+
+ALTER TABLE `bvira_product_packs` CHANGE `size_count` `size_count` INT( 10 ) NULL DEFAULT NULL;
+-----------------------------------------------
+March-20
+
+Task : https://www.lamedicalcare.com/ - Request a call back
+
+admin / elitehour
+
+info@lamedicalcare.com
+-----------------------------------------------
+March-23
+
+Task : Infinite Scroll
+
+/skin/bvira/customer/main/products.tpl
+
+/skin/bvira/customer/main/products_switchers.tpl
+
+/skin/bvira/custom/addons/masonry/js/jquery.infinitescroll.min.js
+
