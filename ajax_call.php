@@ -1,6 +1,6 @@
 <?php
 
-/*----- Include Files -----*/ 
+/*----- Include Files -----*/
 require_once 'auth.php';
 require_once 'include/classes/class.product.php';
 
